@@ -18,6 +18,9 @@ public final class RunnableCommand extends BaseObservable implements ICommand {
     public static final int ISAVAILABLE_PID = BR.available;
 
     public RunnableCommand(@NonNull Runnable action, boolean canExecute) {
+        if (action == null) {
+            throw new IllegalArgumentException("action cannot be null.");
+        }
         mAction = action;
         mListener = null;
         mIsAvailable = canExecute;
