@@ -5,6 +5,10 @@ import android.databinding.BindingAdapter;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+/**
+ * Implementation if ICommand that executes a specified Runnable object and allows external changes
+ * of the "available" bindable property.
+ */
 public final class RunnableCommand extends BaseObservable implements ICommand {
     @NonNull
     private final Runnable mAction;
