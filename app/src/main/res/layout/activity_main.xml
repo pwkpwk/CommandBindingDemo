@@ -4,9 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="converters"
             type="com.ambientbytes.commandbindingdemo.Converters" />
+
         <variable
             name="viewModel"
             type="com.ambientbytes.commandbindingdemo.MainViewModel" />
@@ -18,31 +20,43 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
-        <TextView
+        <android.support.constraint.ConstraintLayout
             android:id="@+id/top_spacer"
             android:layout_width="0dp"
-            android:layout_height="64dp"
+            android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/greeting_label"
-            app:layout_constraintVertical_chainStyle="packed"
             app:constraintsState="@{viewModel.flop.available}"
-            android:text="Top Spacer"
-            android:textAlignment="center"
-            android:gravity="center_vertical" />
+            app:layout_constraintBottom_toTopOf="@id/greeting_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed">
+
+            <TextView
+                android:id="@+id/bam_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="BAM!"
+                android:textColor="@color/colorAccent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </android.support.constraint.ConstraintLayout>
 
         <TextView
             android:id="@+id/greeting_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{viewModel.label}"
             android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:text="@{viewModel.label}"
+            app:layout_constraintBottom_toTopOf="@id/plop_button"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/top_spacer"
-            app:layout_constraintBottom_toTopOf="@id/plop_button" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/top_spacer" />
 
         <!--
         An ICommand object is attached to the text view by a binding adapter that also changes the isClickable
@@ -53,37 +67,68 @@
             android:id="@+id/plop_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Plop!"
-            app:layout_constraintTop_toBottomOf="@+id/greeting_label"
-            app:layout_constraintBottom_toTopOf="@id/flop_button"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:padding="8dp"
             android:onClick="@{viewModel.plop}"
-            android:visibility="@{converters.visibilityFromAvailability(viewModel.plop.available)}" />
+            android:padding="8dp"
+            android:text="Plop!"
+            android:visibility="@{converters.visibilityFromAvailability(viewModel.plop.available)}"
+            app:layout_constraintBottom_toTopOf="@id/button_spacer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/greeting_label" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/button_spacer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layoutConstraints="@{viewModel.buttonSpacerConstraints}"
+            app:layout_constraintBottom_toTopOf="@id/flop_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/plop_button">
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/button_spacer_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button spacer label"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Button spacer label"/>
+            </android.support.constraint.ConstraintLayout>
+        </android.support.constraint.ConstraintLayout>
 
         <TextView
             android:id="@+id/flop_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Flop!"
-            app:layout_constraintTop_toBottomOf="@+id/plop_button"
-            app:layout_constraintBottom_toTopOf="@id/spacer"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:padding="8dp"
             android:onClick="@{viewModel.flop}"
-            android:visibility="@{converters.visibilityFromAvailability(viewModel.flop.available)}" />
+            android:padding="8dp"
+            android:text="Flop!"
+            android:visibility="@{converters.visibilityFromAvailability(viewModel.flop.available)}"
+            app:layout_constraintBottom_toTopOf="@id/spacer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/button_spacer" />
 
         <Space
             android:id="@+id/spacer"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:visibility="invisible"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/message_container"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/flop_button"
-            app:layout_constraintBottom_toTopOf="@id/message_container" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/flop_button" />
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/message_container"
@@ -92,34 +137,34 @@
             android:background="@color/colorAccent"
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/spacer"
+            app:constraintsState="@{viewModel.plop.available}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:constraintsState="@{viewModel.plop.available}">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spacer">
 
             <TextView
                 android:id="@+id/message_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/message_body"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintVertical_chainStyle="packed"
+                android:text="Title"
                 android:textColor="@color/colorPrimary"
-                android:text="Title"/>
+                app:layout_constraintBottom_toTopOf="@id/message_body"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
 
             <TextView
                 android:id="@+id/message_body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/message_title"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:text="Body"
                 android:textColor="@color/colorPrimary"
-                android:text="Body"/>
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/message_title" />
         </android.support.constraint.ConstraintLayout>
 
     </android.support.constraint.ConstraintLayout>
