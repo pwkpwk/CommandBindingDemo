@@ -38,7 +38,7 @@ public final class MainViewModel extends BaseObservable {
     }
 
     private void executeFlop() {
-        mPlopCommand.setAvailable(true);
         mFlopCommand.setAvailable(false);
+        mPlopCommand.setAvailable(true);
     }
 }

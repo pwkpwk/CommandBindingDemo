@@ -13,21 +13,36 @@
     </data>
 
     <android.support.constraint.ConstraintLayout
+        android:id="@+id/layout_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
+
+        <TextView
+            android:id="@+id/top_spacer"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:background="@color/colorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/greeting_label"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:rolledInFromTop="@{viewModel.flop.available}"
+            android:text="Top Spacer"
+            android:textAlignment="center"
+            android:gravity="center_vertical" />
 
         <TextView
             android:id="@+id/greeting_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{viewModel.label}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/plop_button"
-            app:layout_constraintVertical_chainStyle="packed" />
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/top_spacer"
+            app:layout_constraintBottom_toTopOf="@id/plop_button" />
 
         <!--
         An ICommand object is attached to the text view by a binding adapter that also changes the isClickable
@@ -53,12 +68,59 @@
             android:layout_height="wrap_content"
             android:text="Flop!"
             app:layout_constraintTop_toBottomOf="@+id/plop_button"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/spacer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:padding="8dp"
             android:onClick="@{viewModel.flop}"
             android:visibility="@{converters.visibilityFromAvailability(viewModel.flop.available)}" />
+
+        <Space
+            android:id="@+id/spacer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/flop_button"
+            app:layout_constraintBottom_toTopOf="@id/message_container" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/message_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/spacer"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:rolledInFromBottom="@{viewModel.plop.available}">
+
+            <TextView
+                android:id="@+id/message_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/message_body"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintVertical_chainStyle="packed"
+                android:textColor="@color/colorPrimary"
+                android:text="Title"/>
+
+            <TextView
+                android:id="@+id/message_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/message_title"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColor="@color/colorPrimary"
+                android:text="Body"/>
+        </android.support.constraint.ConstraintLayout>
 
     </android.support.constraint.ConstraintLayout>
 </layout>
