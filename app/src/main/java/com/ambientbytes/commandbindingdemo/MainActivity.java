@@ -5,7 +5,6 @@ import android.databinding.DataBindingUtil;
 import android.databinding.OnRebindCallback;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.AutoTransition;
@@ -26,15 +25,58 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        binding.messageContainer.setTag(R.id.tag_layout_root, binding.layoutRoot);
-        binding.topSpacer.setTag(R.id.tag_layout_root, binding.layoutRoot);
+        //
+        // Attach a constraint manager that handles boolean true/false constraint states of the message
+        // container that slides in and out at the bottom of the activity.
+        //
+        ConstraintManager manager = new ConstraintManager(binding.layoutRoot);
+        manager.register(true, new IConstraintUpdater() {
+            @Override
+            public void update(ConstraintSet constraints) {
+                constraints.connect(R.id.spacer, ConstraintSet.BOTTOM, R.id.message_container, ConstraintSet.TOP);
+                constraints.connect(R.id.message_container, ConstraintSet.TOP, R.id.spacer, ConstraintSet.BOTTOM);
+                constraints.connect(R.id.message_container, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+            }
+        });
+        manager.registerDefault(new IConstraintUpdater() {
+            @Override
+            public void update(ConstraintSet constraints) {
+                constraints.connect(R.id.spacer, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+                constraints.connect(R.id.message_container, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+                constraints.clear(R.id.message_container, ConstraintSet.BOTTOM);
+            }
+        });
+        binding.messageContainer.setTag(R.id.tag_constraint_manager, manager);
+        //
+        // Attach a constraint manager that handles boolean true/false constraint states of the spacer
+        // that slides in and out at the top of the activity.
+        //
+        manager = new ConstraintManager(binding.layoutRoot);
+        manager.register(true, new IConstraintUpdater() {
+            @Override
+            public void update(ConstraintSet constraints) {
+                constraints.connect(R.id.top_spacer, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+                constraints.connect(R.id.greeting_label, ConstraintSet.TOP, R.id.top_spacer, ConstraintSet.BOTTOM);
+                constraints.connect(R.id.top_spacer, ConstraintSet.BOTTOM, R.id.greeting_label, ConstraintSet.TOP);
+            }
+        });
+        manager.registerDefault(new IConstraintUpdater() {
+            @Override
+            public void update(ConstraintSet constraints) {
+                constraints.connect(R.id.top_spacer, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+                constraints.connect(R.id.greeting_label, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+                constraints.clear(R.id.top_spacer, ConstraintSet.TOP);
+            }
+        });
+        binding.topSpacer.setTag(R.id.tag_constraint_manager, manager);
+
         binding.setConverters(new Converters());
         binding.setViewModel(mViewModel);
         binding.addOnRebindCallback(new OnRebindCallback() {
             @Override
             public boolean onPreBind(ViewDataBinding binding) {
                 AutoTransition transition = new AutoTransition();
-                transition.setDuration(100);
+                transition.setDuration(125);
                 TransitionManager.beginDelayedTransition((ViewGroup) binding.getRoot(), transition);
                 return super.onPreBind(binding);
             }
@@ -42,49 +84,13 @@ public class MainActivity extends AppCompatActivity {
         binding.executePendingBindings();
     }
 
-    @BindingAdapter("app:rolledInFromTop")
-    public static void setRolledInFromTop(View view, boolean isAvailable) {
-        ConstraintLayout layout = (ConstraintLayout) view.getTag(R.id.tag_layout_root);
+    @BindingAdapter("constraintsState")
+    public static void applyConstraintState(View view, Object stateKey) {
+        Object tag = view.getTag(R.id.tag_constraint_manager);
 
-        if (layout != null) {
-            ConstraintSet constraints = new ConstraintSet();
-
-            constraints.clone(layout);
-
-            if (isAvailable) {
-                constraints.connect(R.id.top_spacer, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
-                constraints.connect(R.id.greeting_label, ConstraintSet.TOP, R.id.top_spacer, ConstraintSet.BOTTOM);
-                constraints.connect(R.id.top_spacer, ConstraintSet.BOTTOM, R.id.greeting_label, ConstraintSet.TOP);
-            } else {
-                constraints.connect(R.id.top_spacer, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
-                constraints.connect(R.id.greeting_label, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
-                constraints.clear(R.id.top_spacer, ConstraintSet.TOP);
-            }
-
-            constraints.applyTo(layout);
-        }
-    }
-
-    @BindingAdapter("app:rolledInFromBottom")
-    public static void setRolledInFromBottom(View view, boolean isAvailable) {
-        ConstraintLayout layout = (ConstraintLayout) view.getTag(R.id.tag_layout_root);
-
-        if (layout != null) {
-            ConstraintSet constraints = new ConstraintSet();
-
-            constraints.clone(layout);
-
-            if (isAvailable) {
-                constraints.connect(R.id.spacer, ConstraintSet.BOTTOM, R.id.message_container, ConstraintSet.TOP);
-                constraints.connect(R.id.message_container, ConstraintSet.TOP, R.id.spacer, ConstraintSet.BOTTOM);
-                constraints.connect(R.id.message_container, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
-            } else {
-                constraints.connect(R.id.spacer, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
-                constraints.connect(R.id.message_container, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
-                constraints.clear(R.id.message_container, ConstraintSet.BOTTOM);
-            }
-
-            constraints.applyTo(layout);
+        if (tag instanceof ConstraintManager) {
+            ConstraintManager manager = (ConstraintManager) tag;
+            manager.apply(stateKey);
         }
     }
 }
