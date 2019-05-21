@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.databinding.OnRebindCallback;
 import android.databinding.ViewDataBinding;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.AutoTransition;
@@ -14,11 +15,15 @@ import android.view.ViewGroup;
 
 import com.ambientbytes.commandbindingdemo.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.IOException;
+
+public class MainActivity extends AppCompatActivity implements IDispatcher {
+    private final IMainModel mModel;
     private final MainViewModel mViewModel;
 
     public MainActivity() {
-        mViewModel = new MainViewModel();
+        mModel = new MainModel(this);
+        mViewModel = new MainViewModel(mModel);
     }
 
     @Override
@@ -82,6 +87,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         binding.executePendingBindings();
+
+        mModel.start(getContentResolver());
+    }
+
+    @Override
+    protected void onDestroy() {
+        try {
+            mViewModel.close();
+        } catch (IOException ex) {
+        }
+        try {
+            mModel.close();
+        } catch (IOException ex) {
+        }
+        super.onDestroy();
     }
 
     @BindingAdapter("constraintsState")
@@ -92,5 +112,10 @@ public class MainActivity extends AppCompatActivity {
             ConstraintManager manager = (ConstraintManager) tag;
             manager.apply(stateKey);
         }
+    }
+
+    @Override
+    public void dispatch(@NonNull Runnable runnable) {
+        runOnUiThread(runnable);
     }
 }

@@ -2,9 +2,15 @@ package com.ambientbytes.commandbindingdemo;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintSet;
 
-public final class MainViewModel extends BaseObservable {
+import java.io.Closeable;
+import java.io.IOException;
+
+public final class MainViewModel extends BaseObservable implements Closeable, IMainModel.ModelListener {
+    @NonNull
+    private final IMainModel mModel;
     private final RunnableCommand mPlopCommand;
     private final RunnableCommand mFlopCommand;
     private final IConstraintLayout mPlopLayout;
@@ -14,7 +20,10 @@ public final class MainViewModel extends BaseObservable {
     public static final int BUTTON_SPACER_LABEL_ID = R.id.button_spacer_label;
     public static final int BUTTONSPACERCONSTRAINTS_PID = BR.buttonSpacerConstraints;
 
-    public MainViewModel() {
+    public MainViewModel(@NonNull final IMainModel model) {
+        mModel = model;
+        mModel.addListener(this);
+
         mPlopCommand = new RunnableCommand(new Runnable() {
             @Override
             public void run() { executePlop(); }
@@ -42,6 +51,11 @@ public final class MainViewModel extends BaseObservable {
         };
 
         mBamLayout = null;
+    }
+
+    @Bindable
+    public boolean isDND() {
+        return mModel.isDND();
     }
 
     @Bindable
@@ -81,5 +95,15 @@ public final class MainViewModel extends BaseObservable {
             mBamLayout = layout;
             notifyPropertyChanged(BUTTONSPACERCONSTRAINTS_PID);
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        mModel.removeListener(this);
+    }
+
+    @Override
+    public void onDndChanged(IMainModel model) {
+        notifyPropertyChanged(BR.dND);
     }
 }

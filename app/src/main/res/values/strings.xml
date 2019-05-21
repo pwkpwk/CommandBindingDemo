@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">CommandBindingDemo</string>
+    <string name="app_name">Command Binding Demo</string>
+    <string name="dnd_is_on">DND is ON</string>
+    <string name="dnd_is_off">DND is OFF</string>
 </resources>
